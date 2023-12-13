@@ -6,8 +6,11 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):   
         try:
             return await call_next(request)
-        except HTTPException as exc:
+        except HTTPException as http_exc:
             return JSONResponse(
-                status_code=exc.status_code,
-                content={"error": exc.detail},
+                status_code=http_exc.status_code,
+                content={"error": http_exc.detail},
             )
+        except Exception as gen_exc:
+            print(gen_exc)
+            return JSONResponse(status_code=500, content={'error': 'Internal server error'})

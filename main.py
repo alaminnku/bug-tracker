@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from middleware.auth import AuthMiddleware
 from middleware.exception import ExceptionMiddleware
-from routers import tasks
+from routers import projects
 
 
 app = FastAPI()
@@ -11,4 +11,4 @@ app.add_middleware(AuthMiddleware)
 app.add_middleware(ExceptionMiddleware)
 
 # Routers
-app.include_router(tasks.router)
+app.include_router(projects.router)
