@@ -7,7 +7,7 @@ app = FastAPI()
 
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        is_authenticated = False
+        is_authenticated = True
         user = {"id": 1, "name": "Alamin"}
 
         if is_authenticated:

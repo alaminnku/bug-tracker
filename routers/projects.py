@@ -11,8 +11,8 @@ async def get_projects(request: Request):
 
 
 @router.get('/projects/{project_id}')
-async def get_project(request: Request):
-    return {'message': 'Get a project'}
+async def get_project(request: Request, project_id):
+    return {'message': f'Get a project {project_id}'}
 
 
 # Create a new project
@@ -24,6 +24,6 @@ async def create_projects(request: Request):
 
 # Update a project
 @router.put('/projects/{project_id}')
-async def update_project(request: Request):
+async def update_project(request: Request, project_id):
     return {'message': 'Update project'}
 
