@@ -1,11 +1,14 @@
 from fastapi import FastAPI
+from middleware.auth import AuthMiddleware
+from middleware.exception import ExceptionMiddleware
+from routers import tasks
+
 
 app = FastAPI()
 
-@app.get('/')
-def get_projects():
-    return {'message': 'Hello world!'}
+# Middleware
+app.add_middleware(AuthMiddleware)
+app.add_middleware(ExceptionMiddleware)
 
-@app.get('/tasks/{id}')
-def get_project(id):
-    return {'task': id}
+# Routers
+app.include_router(tasks.router)
