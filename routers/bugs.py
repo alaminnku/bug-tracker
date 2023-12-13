@@ -26,7 +26,3 @@ async def get_bugs(request: Request):
     return {'message': 'Update bug'}
 
 
-# Delete a bug
-@router.delete('/projects/{project_id}/bugs/{bug_id}')
-async def get_bugs(request: Request):
-    return {'message': 'Delete bug'}

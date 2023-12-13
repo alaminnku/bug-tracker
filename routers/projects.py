@@ -27,8 +27,3 @@ async def create_projects(request: Request):
 async def update_project(request: Request):
     return {'message': 'Update project'}
 
-
-# Delete a project
-@router.delete('/projects/{project_id}')
-async def delete_project(request: Request):
-    return {'message': 'Delete project'}
