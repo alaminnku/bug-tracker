@@ -12,5 +12,5 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
                 content={"error": http_exc.detail},
             )
         except Exception as gen_exc:
-            print(gen_exc)
+            print({'error': gen_exc})
             return JSONResponse(status_code=500, content={'error': 'Internal server error'})
