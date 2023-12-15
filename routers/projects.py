@@ -22,8 +22,14 @@ async def get_projects(token: str = Cookie(None)):
 
 # Get a project
 @router.get('/projects/{project_id}')
-async def get_project(request: Request, project_id):
-    return {'message': f'Get a project {project_id}'}
+async def get_project(project_id: str, token: str = Cookie(None)):
+    # Authenticate user
+    auth_user(token)
+
+    # Get and return the serialized project
+    response = db.projects.find_one({'_id': ObjectId(project_id)})
+    serialized_project = serialize_project(response)
+    return serialized_project
 
 
 # Create a new project
@@ -50,6 +56,6 @@ async def create_project(project: Project, token: str = Cookie(None)):
 
 # Update a project
 @router.put('/projects/{project_id}')
-async def update_project(request: Request, project_id):
+async def update_project(project_id: str):
     return {'message': 'Update project'}
 
