@@ -12,15 +12,19 @@ router = APIRouter()
 # Get all users
 @router.get('/users')
 def get_users():
-    users = serialize_users(db.users.find())
-    return users
+    # Get and return serialized users
+    response = db.users.find()
+    serialized_users = serialize_users(response)
+    return serialized_users
 
 
 # Get a specific user
 @router.get('/users/{user_id}')
 def get_user(user_id: str):
+    # Get and return serialized user
     user = db.users.find_one({'_id': ObjectId(user_id)})
-    return serialize_user(user)
+    serialized_user = serialize_user(user)
+    return serialized_user
 
 
 # Create a new user
@@ -45,9 +49,9 @@ def create_user(response: Response, user: User):
     user_response = db.users.find_one({'_id': inserted_id})
 
     # Set cookie and return the serialized user
-    final_user = serialize_user(user_response)
-    set_cookie(response, final_user['id'])
-    return final_user
+    serialized_user = serialize_user(user_response)
+    set_cookie(response, serialized_user['id'])
+    return serialized_user
 
 
 # Login a user
@@ -63,9 +67,9 @@ def login_user(response: Response, user: LoginUser):
     # Compare passwords
     if user_response and bcrypt.checkpw(password_byte, response_dict['password']):
         # Set cookie and return the serialized user
-        final_user = serialize_user(response_dict)
-        set_cookie(response, final_user['id'])
-        return final_user
+        serialized_user = serialize_user(response_dict)
+        set_cookie(response, serialized_user['id'])
+        return serialized_user
     else:
         raise HTTPException(status_code=401, detail='Invalid credentials')
 
@@ -83,5 +87,5 @@ def update_user(user_id: str, user: UpdateUser):
     updated_response = db.users.find_one({'_id': ObjectId(user_id)})
 
     # Return the serialized user
-    final_user = serialize_user(updated_response)
-    return final_user
+    serialized_user = serialize_user(updated_response)
+    return serialized_user

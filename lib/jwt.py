@@ -26,7 +26,7 @@ def auth_user(token: str):
 
     # Get and return the serialized user
     user = db.users.find_one({'_id': ObjectId(user_id)})
-    final_user = serialize_user(user)
-    return final_user
+    serialized_user = serialize_user(user)
+    return serialized_user
 
 
