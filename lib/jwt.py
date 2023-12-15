@@ -3,7 +3,6 @@ from dotenv import load_dotenv, find_dotenv
 import os
 from config.db import db
 from bson import ObjectId
-from schema.users import serialize_user
 from fastapi import HTTPException
 
 # Load env
@@ -22,11 +21,11 @@ def auth_user(token: str):
         raise HTTPException(status_code=401, detail='Invalid token')
     
     # Get user id
-    user_id = payload['id']
+    user_id = payload['_id']
 
     # Get and return the serialized user
     user = db.users.find_one({'_id': ObjectId(user_id)})
-    serialized_user = serialize_user(user)
-    return serialized_user
+    user['_id'] = str(user['_id'])
+    return user
 
 

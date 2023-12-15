@@ -10,9 +10,9 @@ jwt_secret = os.environ.get('JWT_SECRET')
 jwt_algorithm = os.environ.get('JWT_ALGORITHM')
 
 
-def set_cookie(response: Response, id: str):
+def set_cookie(response: Response, _id: str):
     # Encode the token
-    token = jsonwebtoken.encode({'id': id}, jwt_secret, algorithm=jwt_algorithm)
+    token = jsonwebtoken.encode({'_id': _id}, jwt_secret, algorithm=jwt_algorithm)
 
     # Set cookie to response
     response.set_cookie(

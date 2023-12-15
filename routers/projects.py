@@ -2,7 +2,6 @@ from fastapi import APIRouter, Cookie
 from lib.jwt import auth_user
 from models.projects import Project
 from config.db import db
-from schema.projects import serialize_project, serialize_projects
 from bson import ObjectId
 
 router = APIRouter()
@@ -15,9 +14,13 @@ def get_projects(token: str = Cookie(None)):
     auth_user(token)
 
     # Get and return serialized projects
-    response = db.projects.find()
-    serialized_project = serialize_projects(response)
-    return serialized_project
+    projects_response = db.projects.find()
+
+    projects = []
+    for project in projects_response:
+        project['_id'] = str(project['_id'])
+        projects.append(project)
+    return projects
 
 
 # Get a project
@@ -27,9 +30,9 @@ def get_project(project_id: str, token: str = Cookie(None)):
     auth_user(token)
 
     # Get and return the serialized project
-    response = db.projects.find_one({'_id': ObjectId(project_id)})
-    serialized_project = serialize_project(response)
-    return serialized_project
+    project = db.projects.find_one({'_id': ObjectId(project_id)})
+    project['_id'] = str(project['_id'])
+    return project
 
 
 # Create a new project
@@ -46,12 +49,10 @@ def create_project(project: Project, token: str = Cookie(None)):
     response = db.projects.insert_one(project_dict)
     inserted_id = response.inserted_id
 
-    # Get the added project
-    project_response = db.projects.find_one({'_id': ObjectId(inserted_id)})
-    
-    # Return the serialized project
-    serialized_project = serialize_project(project_response) 
-    return serialized_project
+    # Get and return the created project
+    created_project = db.projects.find_one({'_id': ObjectId(inserted_id)})
+    created_project['_id'] = str(created_project['_id'])
+    return created_project
 
 
 # Update a project
@@ -68,7 +69,7 @@ def update_project(project_id: str, project: Project, token: str = Cookie(None))
     db.projects.update_one({'_id': ObjectId(project_id)}, {'$set': project_dict})
 
     # Get and return the updated serialized project
-    response = db.projects.find_one({'_id': ObjectId(project_id)})
-    serialized_project = serialize_project(response)
-    return serialized_project
+    updated_project = db.projects.find_one({'_id': ObjectId(project_id)})
+    updated_project['_id'] = str(updated_project['_id'])
+    return updated_project
 
