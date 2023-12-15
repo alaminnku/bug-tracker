@@ -10,7 +10,7 @@ router = APIRouter()
 
 # Get all projects
 @router.get('/projects')
-async def get_projects(token: str = Cookie(None)):
+def get_projects(token: str = Cookie(None)):
     # Authenticate user
     auth_user(token)
 
@@ -22,7 +22,7 @@ async def get_projects(token: str = Cookie(None)):
 
 # Get a project
 @router.get('/projects/{project_id}')
-async def get_project(project_id: str, token: str = Cookie(None)):
+def get_project(project_id: str, token: str = Cookie(None)):
     # Authenticate user
     auth_user(token)
 
@@ -34,7 +34,7 @@ async def get_project(project_id: str, token: str = Cookie(None)):
 
 # Create a new project
 @router.post('/projects', status_code=201)
-async def create_project(project: Project, token: str = Cookie(None)):
+def create_project(project: Project, token: str = Cookie(None)):
     # Auth user 
     user = auth_user(token)
 
@@ -56,7 +56,7 @@ async def create_project(project: Project, token: str = Cookie(None)):
 
 # Update a project
 @router.put('/projects/{project_id}')
-async def update_project(project_id: str, project: Project, token: str = Cookie(None)):
+def update_project(project_id: str, project: Project, token: str = Cookie(None)):
     # Authenticate user
     auth_user(token)
 
