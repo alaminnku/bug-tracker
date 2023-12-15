@@ -10,7 +10,6 @@ app = FastAPI()
 origins = ['http://localhost:8000']
 
 # Middleware
-app.add_middleware(AuthMiddleware)
 app.add_middleware(ExceptionMiddleware)
 app.add_middleware(
     CORSMiddleware, 
