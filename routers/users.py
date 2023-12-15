@@ -4,7 +4,7 @@ from models.users import User, LoginUser, UpdateUser
 from schema.users import serialize_user, serialize_users
 import bcrypt
 from bson import ObjectId
-from utils.tools import set_cookie
+from lib.utils import set_cookie
 
 router = APIRouter()
 
@@ -68,6 +68,7 @@ def login_user(response: Response, user: LoginUser):
         return final_user
     else:
         raise HTTPException(status_code=401, detail='Invalid credentials')
+
 
 # Update a user
 @router.put('/users/{user_id}')

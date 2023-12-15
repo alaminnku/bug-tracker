@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from middleware.auth import AuthMiddleware
 from middleware.exception import ExceptionMiddleware
 from routers import users, projects, bugs, comments
 from fastapi.middleware.cors import CORSMiddleware

@@ -9,7 +9,9 @@ class ExceptionMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
         except Exception as exc:
             print(exc)
+            # MongoDB invalid object id
             if 'is not a valid ObjectId' in str(exc):
                 return JSONResponse(status_code=500, content={'detail': 'Invalid ObjectId'})
             
+            # Generic error
             return JSONResponse(status_code=500, content={'message': 'Internal server error'})
