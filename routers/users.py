@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, HTTPException
 from config.db import db
-from models.users import User, LoginUser, UpdateUser
+from models.users import User, UserLogin, UserUpdate
 from schema.users import serialize_user, serialize_users
 import bcrypt
 from bson import ObjectId
@@ -56,7 +56,7 @@ def create_user(response: Response, user: User):
 
 # Login a user
 @router.post('/users/login')
-def login_user(response: Response, user: LoginUser):
+def login_user(response: Response, user: UserLogin):
     # Get the user
     user_response = db.users.find_one({'email': user.email})
     response_dict = dict(user_response)
@@ -76,7 +76,7 @@ def login_user(response: Response, user: LoginUser):
 
 # Update a user
 @router.put('/users/{user_id}')
-def update_user(user_id: str, user: UpdateUser):
+def update_user(user_id: str, user: UserUpdate):
     # Convert the model
     user_dict = dict(user)
 

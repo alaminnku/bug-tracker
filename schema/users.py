@@ -1,8 +1,8 @@
 def serialize_user (user) -> dict:
     return {
         'id': str(user['_id']),
-        'name': str(user['name']),
-        'email': str(user['email'])
+        'name': user['name'],
+        'email': user['email']
     }
 
 

@@ -6,10 +6,15 @@ class User(BaseModel):
     password: str
 
 
-class LoginUser(BaseModel):
+class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-class UpdateUser(BaseModel):
+
+class UserUpdate(BaseModel):
     name: str
     email: EmailStr
+
+
+class UserGeneral(UserUpdate):
+    id: str

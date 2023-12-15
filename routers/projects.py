@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Cookie
+from fastapi import APIRouter, Cookie
 from lib.jwt import auth_user
 from models.projects import Project
 from config.db import db
@@ -40,7 +40,7 @@ async def create_project(project: Project, token: str = Cookie(None)):
 
     # Add the creating user id to the members
     project_dict = dict(project)
-    project_dict['members'].append(user['id'])
+    project_dict['members'].append(user)
 
     # Add project to DB
     response = db.projects.insert_one(project_dict)
@@ -60,8 +60,12 @@ async def update_project(project_id: str, project: Project, token: str = Cookie(
     # Authenticate user
     auth_user(token)
 
+    # Convert JSON member to dictionary
+    project_dict = dict(project)
+    project_dict['members'] = [dict(member) for member in project_dict['members']]
+
     # Update the project
-    db.projects.update_one({'_id': ObjectId(project_id)}, {'$set': dict(project)})
+    db.projects.update_one({'_id': ObjectId(project_id)}, {'$set': project_dict})
 
     # Get and return the updated serialized project
     response = db.projects.find_one({'_id': ObjectId(project_id)})
