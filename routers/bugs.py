@@ -9,14 +9,25 @@ router = APIRouter()
 # Get a projects bugs
 @router.get('/projects/{project_id}/bugs')
 async def get_bugs(project_id: str):
+    # Get the project
     project = db.projects.find_one({'_id': ObjectId(project_id)})
-    return project['bugs']
+
+    # Format and return the bugs
+    bugs = [{'id': str(bug.pop('_id')), **bug} for bug in project['bugs']]
+    return bugs
 
 
 # Get a specific bug
 @router.get('/projects/{project_id}/bugs/{bug_id}')
-async def get_bugs(project_id, bug_id):
-    return {'message': 'Get a bug'}
+async def get_bug(project_id: str, bug_id: str):
+    # Get the project
+    project = db.projects.find_one({'_id': ObjectId(project_id)})
+
+    # Get, update and return the bug
+    found_bug = next(
+        (bug for bug in project['bugs'] if str(bug['_id']) == bug_id), None)
+    found_bug['id'] = str(found_bug.pop('_id'))
+    return found_bug
 
 
 # Create a new bug
@@ -28,7 +39,6 @@ async def create_bug(bug: BugCreate, project_id: str):
     bug_dict['reported_by'] = dict(bug_dict['reported_by'])
     bug_dict['assigned_to'] = dict(bug_dict['assigned_to'])
 
-
     # Add the bug to the project
     db.projects.find_one_and_update(
         {'_id': ObjectId(project_id)}, {'$push': {'bugs': bug_dict}}
@@ -39,7 +49,8 @@ async def create_bug(bug: BugCreate, project_id: str):
 
     # Update the project and bug ids
     updated_project['id'] = str(updated_project.pop('_id'))
-    updated_project['bugs'] = [{ 'id': str(bug.pop('_id')), **bug } for bug in updated_project['bugs']]
+    updated_project['bugs'] = [
+        {'id': str(bug.pop('_id')), **bug} for bug in updated_project['bugs']]
 
     # Return the updated project
     return updated_project
