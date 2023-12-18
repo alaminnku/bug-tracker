@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Cookie
 from lib.jwt import auth_user
-from models.projects import Project
+from models.projects import ProjectCreate, ProjectUpdate
 from config.db import db
 from bson import ObjectId
 
@@ -37,7 +37,7 @@ def get_project(project_id: str, token: str = Cookie(None)):
 
 # Create a new project
 @router.post('/projects', status_code=201)
-def create_project(project: Project, token: str = Cookie(None)):
+def create_project(project: ProjectCreate, token: str = Cookie(None)):
     # Auth user 
     user = auth_user(token)
 
@@ -57,7 +57,7 @@ def create_project(project: Project, token: str = Cookie(None)):
 
 # Update a project
 @router.put('/projects/{project_id}')
-def update_project(project_id: str, project: Project, token: str = Cookie(None)):
+def update_project(project_id: str, project: ProjectUpdate, token: str = Cookie(None)):
     # Authenticate user
     auth_user(token)
 
