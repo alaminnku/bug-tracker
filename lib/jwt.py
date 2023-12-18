@@ -16,7 +16,8 @@ jwt_algorithm = os.environ.get('JWT_ALGORITHM')
 def auth_user(token: str):
     # Decode the token
     try:
-        payload = jsonwebtoken.decode(token, jwt_secret, algorithms=[jwt_algorithm])
+        payload = jsonwebtoken.decode(
+            token, jwt_secret, algorithms=[jwt_algorithm])
     except:
         raise HTTPException(status_code=401, detail='Invalid token')
 

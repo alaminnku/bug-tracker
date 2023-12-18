@@ -13,7 +13,3 @@ client = MongoClient(uri)
 
 # Get database
 db = client['bug-tracker']
-
-
-
-

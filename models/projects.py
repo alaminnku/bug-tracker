@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from models.users import UserGeneral
+from models.users import User
 from datetime import datetime
 from lib.utils import utc_now
 from enum import Enum
@@ -24,7 +24,7 @@ class Status(str, Enum):
 
 
 class Comment(BaseModel):
-    user: UserGeneral
+    user: User
     text: str
     updated_at: datetime = utc_now
 
@@ -35,8 +35,8 @@ class Bug(BaseModel):
     status: Status
     severity: Severity
     priority: Priority
-    reported_by: UserGeneral
-    assigned_to: UserGeneral
+    reported_by: User
+    assigned_to: User
     comments: list[Comment] = []
 
 
@@ -53,7 +53,7 @@ class Project(BaseModel):
     description: str
     start_date: str
     end_date: str
-    members: list[UserGeneral] = []
+    members: list[User] = []
     bugs: list[Bug] = []
 
 

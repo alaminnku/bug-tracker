@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, HTTPException
 from config.db import db
-from models.users import User, UserLogin, UserUpdate
+from models.users import UserCreate, UserLogin, UserUpdate
 import bcrypt
 from bson import ObjectId
 from lib.utils import set_cookie
@@ -32,7 +32,7 @@ def get_user(user_id: str):
 
 # Create a new user
 @router.post('/users', status_code=201)
-def create_user(response: Response, user: User):
+def create_user(response: Response, user: UserCreate):
     # Create the user
     password_byte = user.password.encode('utf-8')
 
@@ -87,6 +87,7 @@ def update_user(user_id: str, user: UserUpdate):
     db.users.update_one({'_id': ObjectId(user_id)}, {'$set': user_dict})
 
     # Get and return the updated user
-    updated_response = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
+    updated_response = db.users.find_one(
+        {'_id': ObjectId(user_id)}, {'password': 0})
     updated_response['id'] = str(updated_response.pop('_id'))
     return updated_response
