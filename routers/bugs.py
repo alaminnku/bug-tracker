@@ -8,8 +8,9 @@ router = APIRouter()
 
 # Get a projects bugs
 @router.get('/projects/{project_id}/bugs')
-async def get_bugs(project_id):
-    return {'message': 'Get bugs'}
+async def get_bugs(project_id: str):
+    project = db.projects.find_one({'_id': ObjectId(project_id)})
+    return project['bugs']
 
 
 # Get a specific bug
