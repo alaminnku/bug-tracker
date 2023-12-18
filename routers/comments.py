@@ -9,8 +9,19 @@ router = APIRouter()
 # Get all comments
 @router.get('/projects/{project_id}/bugs/{bug_id}/comments')
 async def get_comments(project_id: str, bug_id: str):
+    # Get the project
+    project = db.projects.find_one({'_id': ObjectId(project_id)})
 
-    return {'message': 'Get all comments'}
+    # Get the bug
+    bug = next((bug for bug in project['bugs']
+               if str(bug['_id'] == bug_id)), None)
+
+    # Convert comment ObjectId to id
+    comments = [{'id': str(comment.pop('_id')), **comment}
+                for comment in bug['comments']]
+
+    # Return comments
+    return comments
 
 
 # Create a new comment
