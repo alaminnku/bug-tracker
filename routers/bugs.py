@@ -27,12 +27,16 @@ async def create_bug(bug: BugCreate, project_id: str):
     bug_dict['reported_by'] = dict(bug_dict['reported_by'])
     bug_dict['assigned_to'] = dict(bug_dict['assigned_to'])
 
-    # Update add the bug to the project
-    bug_response = db.projects.find_one_and_update(
+
+    # Add the bug to the project
+    db.projects.find_one_and_update(
         {'_id': ObjectId(project_id)}, {'$push': {'bugs': bug_dict}}
     )
-    bug_response['id'] = str(bug_response.pop('_id'))
-    return bug_response
+
+    # Return the updated project
+    updated_project = db.projects.find_one({'_id': ObjectId(project_id)})
+    updated_project['id'] = str(updated_project.pop('_id'))
+    return updated_project
 
 
 # Update a bug
