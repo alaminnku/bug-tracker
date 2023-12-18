@@ -40,12 +40,9 @@ async def create_bug(bug: BugCreate, project_id: str):
     bug_dict['assigned_to'] = dict(bug_dict['assigned_to'])
 
     # Add the bug to the project
-    db.projects.find_one_and_update(
-        {'_id': ObjectId(project_id)}, {'$push': {'bugs': bug_dict}}
+    updated_project = db.projects.find_one_and_update(
+        {'_id': ObjectId(project_id)}, {'$push': {'bugs': bug_dict}}, return_document=True
     )
-
-    # Get the updated project
-    updated_project = db.projects.find_one({'_id': ObjectId(project_id)})
 
     # Update the project and bug ids
     updated_project['id'] = str(updated_project.pop('_id'))
@@ -58,5 +55,29 @@ async def create_bug(bug: BugCreate, project_id: str):
 
 # Update a bug
 @router.put('/projects/{project_id}/bugs/{bug_id}')
-async def get_bugs(project_id: str, bug_id: str, bug: BugUpdate):
-    return {'message': 'Update bug'}
+async def update_bug(project_id: str, bug_id: str, bug: BugUpdate):
+    # Convert bug data to dict
+    bug_dict = dict(bug)
+    bug_dict['reported_by'] = dict(bug_dict['reported_by'])
+    bug_dict['assigned_to'] = dict(bug_dict['assigned_to'])
+
+    # Update the bug
+    updated_project = db.projects.find_one_and_update({'_id': ObjectId(
+        project_id), 'bugs._id': ObjectId(bug_id)}, {'$set': {
+            'bugs.$.title': bug_dict['title'],
+            'bugs.$.description': bug_dict['description'],
+            'bugs.$.status': bug_dict['status'],
+            'bugs.$.severity': bug_dict['severity'],
+            'bugs.$.priority': bug_dict['priority'],
+            'bugs.$.reported_by': bug_dict['reported_by'],
+            'bugs.$.assigned_to': bug_dict['assigned_to'],
+            'bugs.$.comments': bug_dict['comments'],
+        }}, return_document=True)
+
+    # Convert ObjectId to id
+    updated_project['id'] = str(updated_project.pop('_id'))
+    updated_project['bugs'] = [{'id': str(updated_bug.pop(
+        '_id')), **updated_bug} for updated_bug in updated_project['bugs']]
+
+    # Return the updated projected
+    return updated_project
