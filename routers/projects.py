@@ -38,7 +38,7 @@ def get_project(project_id: str, token: str = Cookie(None)):
 # Create a new project
 @router.post('/projects', status_code=201)
 def create_project(project: ProjectCreate, token: str = Cookie(None)):
-    # Auth user 
+    # Auth user
     user = auth_user(token)
 
     # Add the creating user id to the members
@@ -72,4 +72,3 @@ def update_project(project_id: str, project: ProjectUpdate, token: str = Cookie(
     updated_project = db.projects.find_one({'_id': ObjectId(project_id)})
     updated_project['_id'] = str(updated_project['_id'])
     return updated_project
-

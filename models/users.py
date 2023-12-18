@@ -3,7 +3,7 @@ from lib.utils import utc_now
 from datetime import datetime
 
 
-class User(BaseModel): 
+class User(BaseModel):
     name: str
     email: EmailStr
     password: str
@@ -21,5 +21,7 @@ class UserUpdate(BaseModel):
     updated_at: datetime = utc_now
 
 
-class UserGeneral(UserUpdate):
-    _id: str
+class UserGeneral(BaseModel):
+    id: str
+    name: str
+    email: EmailStr

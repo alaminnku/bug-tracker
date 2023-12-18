@@ -26,7 +26,7 @@ class Status(str, Enum):
 class Comment(BaseModel):
     user: UserGeneral
     text: str
-    updated_at: utc_now
+    updated_at: datetime = utc_now
 
 
 class Bug(BaseModel):

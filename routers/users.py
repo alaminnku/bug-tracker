@@ -16,7 +16,7 @@ def get_users():
 
     users = []
     for user in users_response:
-        user['_id'] = str(user['_id'])
+        user['id'] = str(user.pop('_id'))
         users.append(user)
     return users
 
@@ -26,7 +26,7 @@ def get_users():
 def get_user(user_id: str):
     # Get and return the user
     user = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
-    user['_id'] = str(user['_id'])
+    user['id'] = str(user.pop('_id'))
     return user
 
 
@@ -50,10 +50,10 @@ def create_user(response: Response, user: User):
 
     # Get the created user and delete the password
     user_response = db.users.find_one({'_id': inserted_id}, {'password': 0})
-    user_response['_id'] = str(user_response['_id'])
+    user['id'] = str(user.pop('_id'))
 
     # Set cookie and return the created user
-    set_cookie(response, user_response['_id'])
+    set_cookie(response, user_response['id'])
     return user_response
 
 
@@ -62,7 +62,7 @@ def create_user(response: Response, user: User):
 def login_user(response: Response, user: UserLogin):
     # Get the user
     user_response = db.users.find_one({'email': user.email})
-    user_response['_id'] = str(user_response['_id'])
+    user_response['id'] = str(user_response.pop('_id'))
 
     # Create password byte
     password_byte = user.password.encode('utf-8')
@@ -71,7 +71,7 @@ def login_user(response: Response, user: UserLogin):
     if user_response and bcrypt.checkpw(password_byte, user_response['password']):
         # Set cookie and return the user
         del user_response['password']
-        set_cookie(response, user_response['_id'])
+        set_cookie(response, user_response['id'])
         return user_response
     else:
         raise HTTPException(status_code=401, detail='Invalid credentials')
@@ -88,5 +88,5 @@ def update_user(user_id: str, user: UserUpdate):
 
     # Get and return the updated user
     updated_response = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
-    updated_response['_id'] = str(updated_response['_id'])
+    updated_response['id'] = str(updated_response.pop('_id'))
     return updated_response

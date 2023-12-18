@@ -4,14 +4,18 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 
 class ExceptionMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):   
+    async def dispatch(self, request: Request, call_next):
         try:
             return await call_next(request)
         except Exception as exc:
             print(exc)
             # MongoDB invalid object id
-            if 'is not a valid ObjectId' in str(exc):
-                return JSONResponse(status_code=500, content={'detail': 'Invalid ObjectId'})
-            
+            if 'not a valid ObjectId' in str(exc):
+                return JSONResponse(
+                    status_code=500, content={'detail': 'Invalid ObjectId'}
+                )
+
             # Generic error
-            return JSONResponse(status_code=500, content={'message': 'Internal server error'})
+            return JSONResponse(
+                status_code=500, content={'message': 'Internal server error'}
+            )

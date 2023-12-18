@@ -19,13 +19,11 @@ def auth_user(token: str):
         payload = jsonwebtoken.decode(token, jwt_secret, algorithms=[jwt_algorithm])
     except:
         raise HTTPException(status_code=401, detail='Invalid token')
-    
+
     # Get user id
-    user_id = payload['_id']
+    user_id = payload['id']
 
     # Get and return the serialized user
     user = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
-    user['_id'] = str(user['_id'])
+    user['id'] = str(user.pop('_id'))
     return user
-
-
