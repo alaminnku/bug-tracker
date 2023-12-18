@@ -8,6 +8,7 @@ router = APIRouter()
 async def get_bugs(request: Request, project_id):
     return {'message': 'Get bugs'}
 
+
 # Get a specific bug
 @router.get('/projects/{project_id}/bugs/{bug_id}')
 async def get_bugs(request: Request, project_id, bug_id):
@@ -17,6 +18,8 @@ async def get_bugs(request: Request, project_id, bug_id):
 # Create a new bug
 @router.post('/projects/{project_id}/bugs')
 async def get_bugs(request: Request, project_id):
+    print(project_id)
+
     return {'message': 'Create bug'}
 
 

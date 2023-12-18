@@ -12,12 +12,11 @@ router = APIRouter()
 @router.get('/users')
 def get_users():
     # Get and return the users
-    users_response = db.users.find()
+    users_response = db.users.find({}, {'password': 0})
 
     users = []
     for user in users_response:
         user['_id'] = str(user['_id'])
-        del user['password']
         users.append(user)
     return users
 
@@ -26,9 +25,8 @@ def get_users():
 @router.get('/users/{user_id}')
 def get_user(user_id: str):
     # Get and return the user
-    user = db.users.find_one({'_id': ObjectId(user_id)})
+    user = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
     user['_id'] = str(user['_id'])
-    del user['password']
     return user
 
 
@@ -44,16 +42,15 @@ def create_user(response: Response, user: User):
 
     # Update user with hashed password
     user_dict = dict(user)
-    user_dict.update(password = hashed_password)
+    user_dict.update(password=hashed_password)
 
     # Insert the user to DB
     created_response = db.users.insert_one(user_dict)
     inserted_id = created_response.inserted_id
 
     # Get the created user and delete the password
-    user_response = db.users.find_one({'_id': inserted_id})
+    user_response = db.users.find_one({'_id': inserted_id}, {'password': 0})
     user_response['_id'] = str(user_response['_id'])
-    del user_response['password']
 
     # Set cookie and return the created user
     set_cookie(response, user_response['_id'])
@@ -90,7 +87,6 @@ def update_user(user_id: str, user: UserUpdate):
     db.users.update_one({'_id': ObjectId(user_id)}, {'$set': user_dict})
 
     # Get and return the updated user
-    updated_response = db.users.find_one({'_id': ObjectId(user_id)})
+    updated_response = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
     updated_response['_id'] = str(updated_response['_id'])
-    del updated_response['password']
     return updated_response

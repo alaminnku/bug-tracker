@@ -18,8 +18,8 @@ def set_cookie(response: Response, _id: str):
     response.set_cookie(
         'token', 
         token, 
-        httponly = True, 
-        secure = True, 
-        samesite = 'strict',
-        max_age = 7 * 24 * 60 * 60 # 7 days
+        httponly=True,
+        secure=True,
+        samesite='strict',
+        max_age=7 * 24 * 60 * 60  # 7 days
         )
