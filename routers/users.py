@@ -25,7 +25,14 @@ def get_users():
 @router.get('/users/{user_id}')
 def get_user(user_id: str):
     # Get and return the user
-    user = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
+    user = db.users.find_one(
+        {
+            '_id': ObjectId(user_id)
+        },
+        {
+            'password': 0
+        }
+    )
     user['id'] = str(user.pop('_id'))
     return user
 
@@ -49,7 +56,14 @@ def create_user(response: Response, user: UserCreate):
     inserted_id = created_response.inserted_id
 
     # Get the created user and delete the password
-    user_response = db.users.find_one({'_id': inserted_id}, {'password': 0})
+    user_response = db.users.find_one(
+        {
+            '_id': inserted_id
+        },
+        {
+            'password': 0
+        }
+    )
     user['id'] = str(user.pop('_id'))
 
     # Set cookie and return the created user
@@ -84,10 +98,23 @@ def update_user(user_id: str, user: UserUpdate):
     user_dict = dict(user)
 
     # Update the user
-    db.users.update_one({'_id': ObjectId(user_id)}, {'$set': user_dict})
+    db.users.update_one(
+        {
+            '_id': ObjectId(user_id)
+        },
+        {
+            '$set': user_dict
+        }
+    )
 
     # Get and return the updated user
     updated_response = db.users.find_one(
-        {'_id': ObjectId(user_id)}, {'password': 0})
+        {
+            '_id': ObjectId(user_id)
+        },
+        {
+            'password': 0
+        }
+    )
     updated_response['id'] = str(updated_response.pop('_id'))
     return updated_response

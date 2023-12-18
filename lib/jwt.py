@@ -25,6 +25,13 @@ def auth_user(token: str):
     user_id = payload['id']
 
     # Get and return the serialized user
-    user = db.users.find_one({'_id': ObjectId(user_id)}, {'password': 0})
+    user = db.users.find_one(
+        {
+            '_id': ObjectId(user_id)
+        },
+        {
+            'password': 0
+        }
+    )
     user['id'] = str(user.pop('_id'))
     return user

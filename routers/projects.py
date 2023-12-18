@@ -40,7 +40,10 @@ def get_projects(token: str = Cookie(None)):
 
 # Get a project
 @router.get('/projects/{project_id}')
-def get_project(project_id: str, token: str = Cookie(None)):
+def get_project(
+    project_id: str,
+    token: str = Cookie(None)
+):
     # Authenticate user
     auth_user(token)
 
@@ -52,7 +55,10 @@ def get_project(project_id: str, token: str = Cookie(None)):
 
 # Create a new project
 @router.post('/projects', status_code=201)
-def create_project(project: ProjectCreate, token: str = Cookie(None)):
+def create_project(
+    project: ProjectCreate,
+    token: str = Cookie(None)
+):
     # Auth user
     user = auth_user(token)
 
@@ -72,20 +78,31 @@ def create_project(project: ProjectCreate, token: str = Cookie(None)):
 
 # Update a project
 @router.put('/projects/{project_id}')
-def update_project(project_id: str, project: ProjectUpdate, token: str = Cookie(None)):
+def update_project(
+    project_id: str,
+    project: ProjectUpdate,
+    token: str = Cookie(None)
+):
     # Authenticate user
     auth_user(token)
 
     # Convert JSON member to dictionary
     project_dict = dict(project)
-    project_dict['members'] = [dict(member)
-                               for member in project_dict['members']]
+    project_dict['members'] = [
+        dict(member) for member in project_dict['members']
+    ]
 
     # Update the project
-    db.projects.update_one({'_id': ObjectId(project_id)}, {
-                           '$set': project_dict})
+    updated_project = db.projects.find_one_and_update(
+        {
+            '_id': ObjectId(project_id)
+        },
+        {
+            '$set': project_dict
+        },
+        return_document=True
+    )
 
     # Get and return the updated serialized project
-    updated_project = db.projects.find_one({'_id': ObjectId(project_id)})
     updated_project['_id'] = str(updated_project['_id'])
     return updated_project

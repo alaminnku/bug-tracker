@@ -10,7 +10,11 @@ router = APIRouter()
 
 # Get all comments
 @router.get('/projects/{project_id}/bugs/{bug_id}/comments')
-async def get_comments(project_id: str, bug_id: str, token=Cookie(None)):
+async def get_comments(
+    project_id: str,
+    bug_id: str,
+    token=Cookie(None)
+):
     # Auth user
     auth_user(token)
 
@@ -34,7 +38,12 @@ async def get_comments(project_id: str, bug_id: str, token=Cookie(None)):
 
 # Create a new comment
 @router.post('/projects/{project_id}/bugs/{bug_id}/comments')
-async def create_comment(project_id: str, bug_id: str, comment: Comment, token=Cookie(None)):
+async def create_comment(
+    project_id: str,
+    bug_id: str, comment:
+    Comment,
+    token=Cookie(None)
+):
     # Auth user
     auth_user(token)
 
@@ -53,7 +62,9 @@ async def create_comment(project_id: str, bug_id: str, comment: Comment, token=C
             '$push': {
                 'bugs.$.comments': comment_dict
             }
-        }, return_document=True)
+        },
+        return_document=True
+    )
 
     # Convert ObjectId to id
     updated_project['id'] = str(updated_project.pop('_id'))
@@ -73,7 +84,13 @@ async def create_comment(project_id: str, bug_id: str, comment: Comment, token=C
 
 # Update a comment
 @router.put('/projects/{project_id}/bugs/{bug_id}/comments/{comment_id}')
-async def update_comment(project_id: str, bug_id: str, comment_id: str, text: str, token=Cookie(None)):
+async def update_comment(
+    project_id: str,
+    bug_id: str,
+    comment_id: str,
+    text: str,
+    token=Cookie(None)
+):
     # Auth user
     auth_user(token)
 
