@@ -1,22 +1,43 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from config.db import db
+from bson import ObjectId
+from models.projects import Comment
 
 router = APIRouter()
 
 
 # Get all comments
 @router.get('/projects/{project_id}/bugs/{bug_id}/comments')
-async def get_bugs(request: Request, project_id, bug_id):
+async def get_comments(project_id: str, bug_id: str):
+
     return {'message': 'Get all comments'}
 
 
 # Create a new comment
 @router.post('/projects/{project_id}/bugs/{bug_id}/comments')
-async def get_bugs(request: Request, project_id, bug_id):
-    return {'message': 'Create comment'}
+async def create_comment(project_id: str, bug_id: str, comment: Comment):
+    # Convert model to dict
+    comment_dict = dict(comment)
+    comment_dict['_id'] = ObjectId()
+    comment_dict['user'] = dict(comment_dict['user'])
+
+    # Add comment
+    updated_project = db.projects.find_one_and_update(
+        {'_id': ObjectId(project_id), 'bugs._id': ObjectId(bug_id)}, {'$push': {
+            'bugs.$.comments': comment_dict
+        }}, return_document=True)
+
+    # Convert ObjectId to id
+    updated_project['id'] = str(updated_project.pop('_id'))
+    updated_project['bugs'] = [{'id': str(bug.pop('_id')), 'comments': [{'id': str(project_comment.pop(
+        '_id')), **project_comment} for project_comment in bug['comments']], **bug} for bug in updated_project['bugs']]
+    updated_project
+
+    # Return the project
+    return updated_project
 
 
 # Update a comment
 @router.put('/projects/{project_id}/bugs/{bug_id}/comments/{comment_id}')
-async def get_bugs(request: Request, project_id, bug_id, comment_id):
+async def update_comment(project_id: str, bug_id: str, comment_id: str):
     return {'message': 'Update user'}
-
