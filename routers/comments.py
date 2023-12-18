@@ -1,14 +1,19 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Cookie
 from config.db import db
 from bson import ObjectId
 from models.projects import Comment
+from lib.jwt import auth_user
+
 
 router = APIRouter()
 
 
 # Get all comments
 @router.get('/projects/{project_id}/bugs/{bug_id}/comments')
-async def get_comments(project_id: str, bug_id: str):
+async def get_comments(project_id: str, bug_id: str, token=Cookie(None)):
+    # Auth user
+    auth_user(token)
+
     # Get the project
     project = db.projects.find_one({'_id': ObjectId(project_id)})
 
@@ -21,7 +26,7 @@ async def get_comments(project_id: str, bug_id: str):
         {
             'id': str(comment.pop('_id')),
             **comment
-        } for comment in bug['comments']]
+        } for comment in bug.get('comments', [])]
 
     # Return comments
     return comments
@@ -29,7 +34,10 @@ async def get_comments(project_id: str, bug_id: str):
 
 # Create a new comment
 @router.post('/projects/{project_id}/bugs/{bug_id}/comments')
-async def create_comment(project_id: str, bug_id: str, comment: Comment):
+async def create_comment(project_id: str, bug_id: str, comment: Comment, token=Cookie(None)):
+    # Auth user
+    auth_user(token)
+
     # Convert model to dict
     comment_dict = dict(comment)
     comment_dict['_id'] = ObjectId()
@@ -55,9 +63,9 @@ async def create_comment(project_id: str, bug_id: str, comment: Comment):
             'comments': [
                 {
                     'id': str(project_comment.pop('_id')), **project_comment
-                } for project_comment in bug['comments']],
+                } for project_comment in bug.get('comments', [])],
             **bug
-        } for bug in updated_project['bugs']]
+        } for bug in updated_project.get('bugs', [])]
 
     # Return the project
     return updated_project
@@ -65,7 +73,10 @@ async def create_comment(project_id: str, bug_id: str, comment: Comment):
 
 # Update a comment
 @router.put('/projects/{project_id}/bugs/{bug_id}/comments/{comment_id}')
-async def update_comment(project_id: str, bug_id: str, comment_id: str, text: str):
+async def update_comment(project_id: str, bug_id: str, comment_id: str, text: str, token=Cookie(None)):
+    # Auth user
+    auth_user(token)
+
     # Update comment
     updated_project = db.projects.find_one_and_update(
         {
@@ -91,9 +102,9 @@ async def update_comment(project_id: str, bug_id: str, comment_id: str, text: st
                 {
                     'id': str(comment.pop('_id')),
                     **comment
-                } for comment in bug['comments']],
+                } for comment in bug.get('comments', [])],
             **bug
-        } for bug in updated_project['bugs']
+        } for bug in updated_project('bugs', [])
     ]
 
     # Return updated project
