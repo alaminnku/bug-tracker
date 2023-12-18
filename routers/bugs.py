@@ -17,7 +17,7 @@ async def get_bugs(project_id, bug_id):
 
 # Create a new bug
 @router.post('/projects/{project_id}/bugs')
-async def get_bugs(project_id):
+async def create_bug(project_id):
     print(project_id)
 
     return {'message': 'Create bug'}

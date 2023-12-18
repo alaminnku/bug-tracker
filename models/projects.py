@@ -2,6 +2,50 @@ from pydantic import BaseModel
 from models.users import UserGeneral
 from datetime import datetime
 from lib.utils import utc_now
+from enum import Enum
+
+
+class Severity(str, Enum):
+    low = 'low'
+    medium = 'medium'
+    high = 'high'
+
+
+class Priority(str, Enum):
+    low = 'low'
+    medium = 'medium'
+    high = 'high'
+
+
+class Status(str, Enum):
+    open = 'open'
+    in_progress = 'in_progress'
+    closed = 'closed'
+
+
+class Comment(BaseModel):
+    user: UserGeneral
+    text: str
+    updated_at: utc_now
+
+
+class Bug(BaseModel):
+    title: str
+    description: str
+    status: Status
+    severity: Severity
+    priority: Priority
+    reported_by: UserGeneral
+    assigned_to: UserGeneral
+    comments: list[Comment] = []
+
+
+class BugCreate(Bug):
+    created_at: datetime = utc_now
+
+
+class BugUpdate(Bug):
+    updated_at: datetime = utc_now
 
 
 class Project(BaseModel):
@@ -10,6 +54,7 @@ class Project(BaseModel):
     start_date: str
     end_date: str
     members: list[UserGeneral] = []
+    bugs: list[Bug] = []
 
 
 class ProjectCreate(Project):
