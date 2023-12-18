@@ -16,10 +16,25 @@ def get_projects(token: str = Cookie(None)):
     # Get and return serialized projects
     projects_response = db.projects.find()
 
-    projects = []
-    for project in projects_response:
-        project['_id'] = str(project['_id'])
-        projects.append(project)
+    # Convert ObjectId to id
+    projects = [
+        {
+            'id': str(project.pop('_id')),
+            'bugs': [
+                {
+                    'id': str(bug.pop('_id')),
+                    'comments': [
+                        {
+                            'id': str(comment.pop('_id')),
+                            **comment
+                        } for comment in bug.get('comments', [])
+                    ],
+                    **bug
+                } for bug in project.get('bugs', [])],
+            **project
+        } for project in projects_response]
+
+    # Return projects
     return projects
 
 
@@ -63,10 +78,12 @@ def update_project(project_id: str, project: ProjectUpdate, token: str = Cookie(
 
     # Convert JSON member to dictionary
     project_dict = dict(project)
-    project_dict['members'] = [dict(member) for member in project_dict['members']]
+    project_dict['members'] = [dict(member)
+                               for member in project_dict['members']]
 
     # Update the project
-    db.projects.update_one({'_id': ObjectId(project_id)}, {'$set': project_dict})
+    db.projects.update_one({'_id': ObjectId(project_id)}, {
+                           '$set': project_dict})
 
     # Get and return the updated serialized project
     updated_project = db.projects.find_one({'_id': ObjectId(project_id)})
