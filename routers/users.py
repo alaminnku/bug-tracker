@@ -120,28 +120,28 @@ def login_user(response: Response, user: UserLogin):
         raise HTTPException(status_code=401, detail='Invalid credentials')
 
 
-# Update a user
-@router.put('/users/{user_id}')
-def update_user(user_id: str, user: UserUpdate):
-    # Convert the model
-    user_dict = dict(user)
+# # Update a user
+# @router.put('/users/{user_id}')
+# def update_user(user_id: str, user: UserUpdate):
+#     # Convert the model
+#     user_dict = dict(user)
 
-    # Update the user
-    updated_response = db.users.find_one_and_update(
-        {
-            '_id': ObjectId(user_id)
-        },
-        {
-            '$set': user_dict
-        },
-        {
-            'password': 0,
-            'created_at': 0,
-            'updated_at': 0
-        },
-        return_document=True
-    )
+#     # Update the user
+#     updated_response = db.users.find_one_and_update(
+#         {
+#             '_id': ObjectId(user_id)
+#         },
+#         {
+#             '$set': user_dict
+#         },
+#         {
+#             'password': 0,
+#             'created_at': 0,
+#             'updated_at': 0
+#         },
+#         return_document=True
+#     )
 
-    # Return the updated user
-    updated_response['id'] = str(updated_response.pop('_id'))
-    return updated_response
+#     # Return the updated user
+#     updated_response['id'] = str(updated_response.pop('_id'))
+#     return updated_response
