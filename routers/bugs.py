@@ -105,8 +105,8 @@ async def create_bug(
 @router.put('/projects/{project_id}/bugs/{bug_id}')
 async def update_bug(
     project_id: str,
-    bug_id: str, bug:
-    BugUpdate,
+    bug_id: str,
+    bug: BugUpdate,
     token=Cookie(None)
 ):
     # Auth user
@@ -132,6 +132,7 @@ async def update_bug(
                 'bugs.$.priority': bug_dict['priority'],
                 'bugs.$.reported_by': bug_dict['reported_by'],
                 'bugs.$.assigned_to': bug_dict['assigned_to'],
+                'bugs.$.updated_at': bug_dict['updated_at']
             }
         },
         {

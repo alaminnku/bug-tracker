@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Cookie
 from config.db import db
 from bson import ObjectId
-from models.comments import Comment
+from models.comments import CommentCreate, CommentUpdate
 from lib.auth import auth_user
 from lib.utils import serialize_project
 
@@ -20,7 +20,15 @@ async def get_comments(
     auth_user(token)
 
     # Get the project
-    project = db.projects.find_one({'_id': ObjectId(project_id)})
+    project = db.projects.find_one(
+        {
+            '_id': ObjectId(project_id)
+        },
+        {
+            'created_at': 0,
+            'updated_at': 0
+        }
+    )
 
     # Get the bug
     bug = next((bug for bug in project['bugs']
@@ -41,8 +49,8 @@ async def get_comments(
 @router.post('/projects/{project_id}/bugs/{bug_id}/comments')
 async def create_comment(
     project_id: str,
-    bug_id: str, comment:
-    Comment,
+    bug_id: str,
+    comment: CommentCreate,
     token=Cookie(None)
 ):
     # Auth user
@@ -71,18 +79,6 @@ async def create_comment(
     updated_project = serialize_project(project_response)
     return updated_project
 
-    # # Convert ObjectId to id
-    # updated_project['id'] = str(updated_project.pop('_id'))
-    # updated_project['bugs'] = [
-    #     {
-    #         'id': str(bug.pop('_id')),
-    #         'comments': [
-    #             {
-    #                 'id': str(project_comment.pop('_id')), **project_comment
-    #             } for project_comment in bug.get('comments', [])],
-    #         **bug
-    #     } for bug in updated_project.get('bugs', [])]
-
 
 # Update a comment
 @router.put('/projects/{project_id}/bugs/{bug_id}/comments/{comment_id}')
@@ -90,11 +86,13 @@ async def update_comment(
     project_id: str,
     bug_id: str,
     comment_id: str,
-    text: str,
+    comment: CommentUpdate,
     token=Cookie(None)
 ):
     # Auth user
     auth_user(token)
+
+    comment_dict = dict(comment)
 
     # Update comment
     project_response = db.projects.find_one_and_update(
@@ -105,8 +103,13 @@ async def update_comment(
         },
         {
             '$set': {
-                'bugs.$.comments.$[comment].text': text
+                'bugs.$.comments.$[comment].text': comment_dict['text'],
+                'bugs.$.comments.$[comment].updated_at': comment_dict['updated_at']
             }
+        },
+        {
+            'created_at': 0,
+            'updated_at': 0
         },
         array_filters=[{'comment._id': ObjectId(comment_id)}],
         return_document=True
@@ -115,20 +118,3 @@ async def update_comment(
     # Serialize and return the project
     updated_project = serialize_project(project_response)
     return updated_project
-
-    # # Convert ObjectId to id
-    # updated_project['id'] = str(updated_project.pop('_id'))
-    # updated_project['bugs'] = [
-    #     {
-    #         'id': str(bug.pop('_id')),
-    #         'comments': [
-    #             {
-    #                 'id': str(comment.pop('_id')),
-    #                 **comment
-    #             } for comment in bug.get('comments', [])],
-    #         **bug
-    #     } for bug in updated_project('bugs', [])
-    # ]
-
-    # # Return updated project
-    # return updated_project
