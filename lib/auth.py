@@ -54,5 +54,10 @@ def auth_user(token: str):
             'password': 0
         }
     )
-    user['id'] = str(user.pop('_id'))
-    return user
+
+    # Check and return the user
+    if user:
+        user['id'] = str(user.pop('_id'))
+        return user
+    else:
+        raise HTTPException(status_code=404, detail='No user found')
