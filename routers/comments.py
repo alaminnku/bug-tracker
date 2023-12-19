@@ -3,6 +3,7 @@ from config.db import db
 from bson import ObjectId
 from models.projects import Comment
 from lib.auth import auth_user
+from lib.utils import serialize_project
 
 
 router = APIRouter()
@@ -53,7 +54,7 @@ async def create_comment(
     comment_dict['user'] = dict(comment_dict['user'])
 
     # Add comment
-    updated_project = db.projects.find_one_and_update(
+    project_response = db.projects.find_one_and_update(
         {
             '_id': ObjectId(project_id),
             'bugs._id': ObjectId(bug_id)
@@ -66,20 +67,21 @@ async def create_comment(
         return_document=True
     )
 
-    # Convert ObjectId to id
-    updated_project['id'] = str(updated_project.pop('_id'))
-    updated_project['bugs'] = [
-        {
-            'id': str(bug.pop('_id')),
-            'comments': [
-                {
-                    'id': str(project_comment.pop('_id')), **project_comment
-                } for project_comment in bug.get('comments', [])],
-            **bug
-        } for bug in updated_project.get('bugs', [])]
-
-    # Return the project
+    # Serialize and return the project
+    updated_project = serialize_project(project_response)
     return updated_project
+
+    # # Convert ObjectId to id
+    # updated_project['id'] = str(updated_project.pop('_id'))
+    # updated_project['bugs'] = [
+    #     {
+    #         'id': str(bug.pop('_id')),
+    #         'comments': [
+    #             {
+    #                 'id': str(project_comment.pop('_id')), **project_comment
+    #             } for project_comment in bug.get('comments', [])],
+    #         **bug
+    #     } for bug in updated_project.get('bugs', [])]
 
 
 # Update a comment
@@ -95,7 +97,7 @@ async def update_comment(
     auth_user(token)
 
     # Update comment
-    updated_project = db.projects.find_one_and_update(
+    project_response = db.projects.find_one_and_update(
         {
             '_id': ObjectId(project_id),
             'bugs._id': ObjectId(bug_id),
@@ -110,19 +112,23 @@ async def update_comment(
         return_document=True
     )
 
-    # Convert ObjectId to id
-    updated_project['id'] = str(updated_project.pop('_id'))
-    updated_project['bugs'] = [
-        {
-            'id': str(bug.pop('_id')),
-            'comments': [
-                {
-                    'id': str(comment.pop('_id')),
-                    **comment
-                } for comment in bug.get('comments', [])],
-            **bug
-        } for bug in updated_project('bugs', [])
-    ]
-
-    # Return updated project
+    # Serialize and return the project
+    updated_project = serialize_project(project_response)
     return updated_project
+
+    # # Convert ObjectId to id
+    # updated_project['id'] = str(updated_project.pop('_id'))
+    # updated_project['bugs'] = [
+    #     {
+    #         'id': str(bug.pop('_id')),
+    #         'comments': [
+    #             {
+    #                 'id': str(comment.pop('_id')),
+    #                 **comment
+    #             } for comment in bug.get('comments', [])],
+    #         **bug
+    #     } for bug in updated_project('bugs', [])
+    # ]
+
+    # # Return updated project
+    # return updated_project
