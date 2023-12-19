@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Cookie
 from config.db import db
 from bson import ObjectId
-from models.projects import Comment
+from models.comments import Comment
 from lib.auth import auth_user
 from lib.utils import serialize_project
 

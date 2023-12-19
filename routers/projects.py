@@ -15,7 +15,13 @@ def get_projects(token: str = Cookie(None)):
     auth_user(token)
 
     # Get and return serialized projects
-    projects_response = db.projects.find()
+    projects_response = db.projects.find(
+        {},
+        {
+            'created_at': 0,
+            'updated_at': 0
+        }
+    )
 
     # Return the serialized projects
     projects = [serialize_project(project) for project in projects_response]
@@ -32,7 +38,15 @@ def get_project(
     auth_user(token)
 
     # Get the project
-    project_response = db.projects.find_one({'_id': ObjectId(project_id)})
+    project_response = db.projects.find_one(
+        {
+            '_id': ObjectId(project_id)
+        },
+        {
+            'created_at': 0,
+            'updated_at': 0
+        }
+    )
 
     # Return the serialized project
     project = serialize_project(project_response)
@@ -48,16 +62,22 @@ def create_project(
     # Auth user
     user = auth_user(token)
 
-    # Add the creating user id to the members
+    # Add the user to the members
     project_dict = dict(project)
     project_dict['members'].append(user)
 
     # Add project to DB
     response = db.projects.insert_one(project_dict)
-    inserted_id = response.inserted_id
 
     # Get the created project
-    created_response = db.projects.find_one({'_id': ObjectId(inserted_id)})
+    created_response = db.projects.find_one(
+        {
+            '_id': ObjectId(response.inserted_id)
+        },
+        {
+            'created_at': 0
+        }
+    )
 
     # Return the serialized project
     created_project = serialize_project(created_response)
@@ -76,9 +96,6 @@ def update_project(
 
     # Convert JSON member to dictionary
     project_dict = dict(project)
-    project_dict['members'] = [
-        dict(member) for member in project_dict['members']
-    ]
 
     # Update the project
     updated_response = db.projects.find_one_and_update(
@@ -86,7 +103,19 @@ def update_project(
             '_id': ObjectId(project_id)
         },
         {
-            '$set': project_dict
+            '$set': {
+                'name': project_dict['name'],
+                'description': project_dict['description'],
+                'start_date': project_dict['start_date'],
+                'end_date': project_dict['end_date'],
+                'members': [
+                    dict(member) for member in project_dict['members']
+                ]
+            }
+        },
+        {
+            'created_at': 0,
+            'update_at': 0
         },
         return_document=True
     )

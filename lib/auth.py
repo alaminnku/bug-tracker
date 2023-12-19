@@ -51,7 +51,9 @@ def auth_user(token: str):
             '_id': ObjectId(user_id)
         },
         {
-            'password': 0
+            'password': 0,
+            'created_at': 0,
+            'updated_at': 0
         }
     )
 
