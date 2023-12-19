@@ -3,7 +3,7 @@ from config.db import db
 from models.users import UserCreate, UserLogin, UserUpdate
 import bcrypt
 from bson import ObjectId
-from lib.utils import set_cookie
+from lib.auth import set_cookie
 
 router = APIRouter()
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Cookie
 from models.projects import BugCreate, BugUpdate
 from config.db import db
 from bson import ObjectId
-from lib.jwt import auth_user
+from lib.auth import auth_user
 
 router = APIRouter()
 
