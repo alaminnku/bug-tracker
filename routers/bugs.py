@@ -14,11 +14,19 @@ async def get_bugs(
     project_id: str,
     token=Cookie(None)
 ):
-    # Auth user
+    # Authenticate user
     auth_user(token)
 
     # Get the project
-    project = db.projects.find_one({'_id': ObjectId(project_id)})
+    project = db.projects.find_one(
+        {
+            '_id': ObjectId(project_id)
+        },
+        {
+            'created_at': 0,
+            'updated_at': 0
+        }
+    )
 
     # Format and return the bugs
     bugs = [
@@ -26,7 +34,6 @@ async def get_bugs(
             'id': str(bug.pop('_id')),
             **bug
         } for bug in project.get('bugs', [])]
-
     return bugs
 
 
@@ -41,7 +48,15 @@ async def get_bug(
     auth_user(token)
 
     # Get the project
-    project = db.projects.find_one({'_id': ObjectId(project_id)})
+    project = db.projects.find_one(
+        {
+            '_id': ObjectId(project_id)
+        },
+        {
+            'created_at': 0,
+            'updated_at': 0
+        }
+    )
 
     # Get, update and return the bug
     found_bug = next(
@@ -74,23 +89,16 @@ async def create_bug(
         {
             '$push': {'bugs': bug_dict}
         },
+        {
+            'created_at': 0,
+            'updated_at': 0
+        },
         return_document=True
     )
 
     # Serialize and return the project
     updated_project = serialize_project(project_response)
     return updated_project
-
-    # # Update the project and bug ids
-    # updated_project['id'] = str(updated_project.pop('_id'))
-    # updated_project['bugs'] = [
-    #     {
-    #         'id': str(bug.pop('_id')),
-    #         **bug
-    #     } for bug in updated_project['bugs']]
-
-    # # Return the updated project
-    # return updated_project
 
 
 # Update a bug
@@ -124,22 +132,14 @@ async def update_bug(
                 'bugs.$.priority': bug_dict['priority'],
                 'bugs.$.reported_by': bug_dict['reported_by'],
                 'bugs.$.assigned_to': bug_dict['assigned_to'],
-                'bugs.$.comments': bug_dict['comments'],
             }
+        },
+        {
+            'created_at': 0,
+            'updated_at': 0
         },
         return_document=True)
 
     # Serialize and return the project
     updated_project = serialize_project(project_response)
     return updated_project
-
-    # # Convert ObjectId to id
-    # updated_project['id'] = str(updated_project.pop('_id'))
-    # updated_project['bugs'] = [
-    #     {
-    #         'id': str(updated_bug.pop('_id')),
-    #         **updated_bug
-    #     } for updated_bug in updated_project.get('bugs', [])]
-
-    # # Return the updated projected
-    # return updated_project

@@ -1,7 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
 from models.users import User
-from models.comments import Comment
 from datetime import datetime
 from lib.utils import utc_now
 
@@ -32,7 +31,6 @@ class Bug(BaseModel):
     priority: Priority
     reported_by: User
     assigned_to: User
-    comments: list[Comment] = []
 
 
 class BugCreate(Bug):
