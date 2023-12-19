@@ -64,7 +64,7 @@ def create_user(response: Response, user: UserCreate):
             'password': 0
         }
     )
-    user['id'] = str(user.pop('_id'))
+    user_response['id'] = str(user_response.pop('_id'))
 
     # Set cookie and return the created user
     set_cookie(response, user_response['id'])
@@ -98,23 +98,16 @@ def update_user(user_id: str, user: UserUpdate):
     user_dict = dict(user)
 
     # Update the user
-    db.users.update_one(
+    updated_response = db.users.find_one_and_update(
         {
             '_id': ObjectId(user_id)
         },
         {
             '$set': user_dict
-        }
+        },
+        return_document=True
     )
 
-    # Get and return the updated user
-    updated_response = db.users.find_one(
-        {
-            '_id': ObjectId(user_id)
-        },
-        {
-            'password': 0
-        }
-    )
+    # Return the updated user
     updated_response['id'] = str(updated_response.pop('_id'))
     return updated_response
