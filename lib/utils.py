@@ -11,32 +11,41 @@ def get_utc_now():
 utc_now = Field(get_utc_now())
 
 
-# Serialize project
-def serialize_project(project):
-    updated_project = {
-        'id': str(project.pop('_id')),
-        'bugs': [serialize_bug(bug) for bug in project.get('bugs', [])],
-        **project
-    }
-    return updated_project
+# Serialize comment
+def serialize_comment(comment):
+    # Format id
+    comment['id'] = str(comment.pop('_id'))
+
+    # Return serialized comment
+    return comment
 
 
 # Serialize bug
 def serialize_bug(bug):
-    updated_bug = {
-        'id': str(bug.pop('_id')),
-        'comments': [
-            serialize_comment(comment) for comment in bug.get('comments', [])
-        ],
-        **bug
-    }
-    return updated_bug
+    # Format id
+    bug['id'] = str(bug.pop('_id'))
+
+    # Serialize comments
+    serialized_comments = [serialize_comment(
+        comment) for comment in bug.get('comments', [])]
+
+    # Update comments
+    bug['comments'] = serialized_comments
+
+    # Return serialized bug
+    return bug
 
 
-# Serialize comment
-def serialize_comment(comment):
-    updated_comment = {
-        'id': str(comment.pop('_id')),
-        **comment
-    }
-    return updated_comment
+# Serialize project
+def serialize_project(project):
+    # Format id
+    project['id'] = str(project.pop('_id'))
+
+    # Serialize bugs
+    serialized_bugs = [serialize_bug(bug) for bug in project.get('bugs', [])]
+
+    # Update bugs
+    project['bugs'] = serialized_bugs
+
+    # Return serialized project
+    return project
