@@ -3,7 +3,7 @@ from models.bugs import BugCreate, BugUpdate
 from config.db import db
 from bson import ObjectId
 from lib.auth import auth_user
-from lib.utils import serialize_project
+from lib.utils import serialize_project, serialize_bug
 
 router = APIRouter()
 
@@ -29,11 +29,7 @@ async def get_bugs(
     )
 
     # Format and return the bugs
-    bugs = [
-        {
-            'id': str(bug.pop('_id')),
-            **bug
-        } for bug in project.get('bugs', [])]
+    bugs = [serialize_bug(bug) for bug in project.get('bugs', [])]
     return bugs
 
 
@@ -58,11 +54,12 @@ async def get_bug(
         }
     )
 
-    # Get, update and return the bug
+    # Find, serialize and return the bug
     found_bug = next(
-        (bug for bug in project['bugs'] if str(bug['_id']) == bug_id), None)
-    found_bug['id'] = str(found_bug.pop('_id'))
-    return found_bug
+        (bug for bug in project['bugs'] if str(bug['_id']) == bug_id), None
+    )
+    bug = serialize_bug(found_bug)
+    return bug
 
 
 # Create a new bug
