@@ -11,7 +11,7 @@ router = APIRouter()
 
 # Get all comments
 @router.get('/projects/{project_id}/bugs/{bug_id}/comments')
-async def get_comments(
+def get_comments(
     project_id: str,
     bug_id: str,
     token=Cookie(None)
@@ -47,7 +47,7 @@ async def get_comments(
 
 # Create a new comment
 @router.post('/projects/{project_id}/bugs/{bug_id}/comments')
-async def create_comment(
+def create_comment(
     project_id: str,
     bug_id: str,
     comment: CommentCreate,
@@ -82,7 +82,7 @@ async def create_comment(
 
 # Update a comment
 @router.put('/projects/{project_id}/bugs/{bug_id}/comments/{comment_id}')
-async def update_comment(
+def update_comment(
     project_id: str,
     bug_id: str,
     comment_id: str,

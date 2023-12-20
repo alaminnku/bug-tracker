@@ -10,7 +10,7 @@ router = APIRouter()
 
 # Get a projects bugs
 @router.get('/projects/{project_id}/bugs')
-async def get_bugs(
+def get_bugs(
     project_id: str,
     token=Cookie(None)
 ):
@@ -35,7 +35,7 @@ async def get_bugs(
 
 # Get a specific bug
 @router.get('/projects/{project_id}/bugs/{bug_id}')
-async def get_bug(
+def get_bug(
     project_id: str,
     bug_id: str,
     token=Cookie(None)
@@ -64,7 +64,7 @@ async def get_bug(
 
 # Create a new bug
 @router.post('/projects/{project_id}/bugs')
-async def create_bug(
+def create_bug(
     bug: BugCreate,
     project_id: str,
     token=Cookie(None)
@@ -100,7 +100,7 @@ async def create_bug(
 
 # Update a bug
 @router.put('/projects/{project_id}/bugs/{bug_id}')
-async def update_bug(
+def update_bug(
     project_id: str,
     bug_id: str,
     bug: BugUpdate,
